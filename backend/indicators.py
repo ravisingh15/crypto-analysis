@@ -66,6 +66,78 @@ def calculate_rvol(volume: pd.Series, period: int = 20) -> pd.Series:
     rvol = volume / (avg_vol + 1e-10)
     return rvol
 
+def calculate_stoch_rsi(rsi: pd.Series, period: int = 14, smoothK: int = 3, smoothD: int = 3) -> Dict[str, pd.Series]:
+    """Calculate Stochastic RSI."""
+    rsi_min = rsi.rolling(window=period).min()
+    rsi_max = rsi.rolling(window=period).max()
+    stoch_rsi = 100 * (rsi - rsi_min) / (rsi_max - rsi_min + 1e-10)
+    k = stoch_rsi.rolling(window=smoothK).mean()
+    d = k.rolling(window=smoothD).mean()
+    return {"k": k, "d": d}
+
+def calculate_keltner_channels(high: pd.Series, low: pd.Series, close: pd.Series, period: int = 20, multiplier: float = 1.5) -> Dict[str, pd.Series]:
+    """Calculate Keltner Channels (Middle, Upper, Lower)."""
+    ema = calculate_ema(close, period)
+    atr = calculate_atr(high, low, close, period)
+    upper = ema + (atr * multiplier)
+    lower = ema - (atr * multiplier)
+    return {"middle": ema, "upper": upper, "lower": lower}
+
+def calculate_vwma(close: pd.Series, volume: pd.Series, period: int = 20) -> pd.Series:
+    """Calculate Volume-Weighted Moving Average (VWMA)."""
+    pv = close * volume
+    vwma = pv.rolling(window=period).sum() / (volume.rolling(window=period).sum() + 1e-10)
+    return vwma
+
+def calculate_supertrend(high: pd.Series, low: pd.Series, close: pd.Series, period: int = 10, multiplier: float = 3.0) -> Dict[str, pd.Series]:
+    """Calculate Supertrend indicator (trend direction + trailing stop line)."""
+    atr = calculate_atr(high, low, close, period)
+    hl2 = (high + low) / 2
+    
+    basic_ub = hl2 + (multiplier * atr)
+    basic_lb = hl2 - (multiplier * atr)
+    
+    n = len(close)
+    final_ub = np.zeros(n)
+    final_lb = np.zeros(n)
+    supertrend = np.zeros(n)
+    direction = np.zeros(n)
+    
+    close_vals = close.values
+    basic_ub_vals = basic_ub.values
+    basic_lb_vals = basic_lb.values
+    
+    for i in range(1, n):
+        if basic_ub_vals[i] < final_ub[i-1] or close_vals[i-1] > final_ub[i-1]:
+            final_ub[i] = basic_ub_vals[i]
+        else:
+            final_ub[i] = final_ub[i-1]
+            
+        if basic_lb_vals[i] > final_lb[i-1] or close_vals[i-1] < final_lb[i-1]:
+            final_lb[i] = basic_lb_vals[i]
+        else:
+            final_lb[i] = final_lb[i-1]
+            
+        if direction[i-1] == 1:
+            if close_vals[i] < final_lb[i]:
+                direction[i] = -1
+                supertrend[i] = final_ub[i]
+            else:
+                direction[i] = 1
+                supertrend[i] = final_lb[i]
+        else:
+            if close_vals[i] > final_ub[i]:
+                direction[i] = 1
+                supertrend[i] = final_lb[i]
+            else:
+                direction[i] = -1
+                supertrend[i] = final_ub[i]
+                
+    return {
+        "supertrend": pd.Series(supertrend, index=close.index),
+        "direction": pd.Series(direction, index=close.index)
+    }
+
 def enrich_klines_dataframe(raw_klines: List[List[Any]]) -> pd.DataFrame:
     """
     Parse raw Binance klines raw array into a structured DataFrame and calculate 
@@ -96,8 +168,10 @@ def enrich_klines_dataframe(raw_klines: List[List[Any]]) -> pd.DataFrame:
     df["macd_signal"] = macd_dict["signal"]
     df["macd_hist"] = macd_dict["hist"]
     
+    df["ema_8"] = calculate_ema(df["close"], 8)
     df["ema_9"] = calculate_ema(df["close"], 9)
     df["ema_21"] = calculate_ema(df["close"], 21)
+    df["ema_55"] = calculate_ema(df["close"], 55)
     df["ema_50"] = calculate_ema(df["close"], 50)
     df["ema_200"] = calculate_ema(df["close"], 200)
     
@@ -109,5 +183,21 @@ def enrich_klines_dataframe(raw_klines: List[List[Any]]) -> pd.DataFrame:
     
     df["atr"] = calculate_atr(df["high"], df["low"], df["close"], period=14)
     df["rvol"] = calculate_rvol(df["volume"], period=20)
+    
+    stoch = calculate_stoch_rsi(df["rsi"], period=14, smoothK=3, smoothD=3)
+    df["stoch_k"] = stoch["k"]
+    df["stoch_d"] = stoch["d"]
+    
+    kc = calculate_keltner_channels(df["high"], df["low"], df["close"], period=20, multiplier=1.5)
+    df["kc_middle"] = kc["middle"]
+    df["kc_upper"] = kc["upper"]
+    df["kc_lower"] = kc["lower"]
+
+    st = calculate_supertrend(df["high"], df["low"], df["close"], period=10, multiplier=3.0)
+    df["supertrend"] = st["supertrend"]
+    df["supertrend_dir"] = st["direction"]
+    
+    df["vwma_8"] = calculate_vwma(df["close"], df["volume"], 8)
+    df["vwma_21"] = calculate_vwma(df["close"], df["volume"], 21)
 
     return df

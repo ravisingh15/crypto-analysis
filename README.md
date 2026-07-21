@@ -29,6 +29,9 @@
    - `01_binance_data_exploration.ipynb`: Market summary, 24h volume leaders, and candlestick ingestion.
    - `02_indicator_deep_dive.ipynb`: Multi-indicator plotting with Plotly dark themes.
    - `03_screener_backtest.ipynb`: Backtesting technical signal rules against historical klines.
+   - `04_strategy_backtest_comparison.ipynb`: 20-strategy comparison with win rate, Sharpe ratio, equity curves, and composite ranking.
+   - `05_multi_timeframe_analysis.ipynb`: Multi-timeframe (5m/15m/1h/4h) 20-strategy comparison plus Crypto vs Gold (XAUTUSDT, PAXGUSDT) analysis.
+   - `06_atr_risk_management_backtest.ipynb`: Bar-by-bar ATR Stop-Loss & Take-Profit simulator testing 1:1.5, 1:2.0, and 1:3.0 Risk-to-Reward ratios and account equity growth ($1,000 capital, 2% risk/trade).
 
 ---
 
@@ -44,7 +47,10 @@ crypto-analysis/
 ├── notebooks/                         # Jupyter Notebooks for analysis
 │   ├── 01_binance_data_exploration.ipynb
 │   ├── 02_indicator_deep_dive.ipynb
-│   └── 03_screener_backtest.ipynb
+│   ├── 03_screener_backtest.ipynb
+│   ├── 04_strategy_backtest_comparison.ipynb
+│   ├── 05_multi_timeframe_analysis.ipynb
+│   └── 06_atr_risk_management_backtest.ipynb
 ├── backend/
 │   ├── config.py                      # Environment configuration loader
 │   ├── binance_client.py              # REST API client with failover endpoints
@@ -101,6 +107,9 @@ Navigate to the `notebooks/` directory and open any of the notebooks:
 - **`01_binance_data_exploration.ipynb`**: Fetch 24h market metrics & ticker statistics.
 - **`02_indicator_deep_dive.ipynb`**: Plot RSI, MACD, and EMA charts interactively.
 - **`03_screener_backtest.ipynb`**: Test technical signal win-rates against historical candles.
+- **`04_strategy_backtest_comparison.ipynb`**: Full 20-strategy backtest comparison with performance metrics, heatmaps, and equity curves.
+- **`05_multi_timeframe_analysis.ipynb`**: Multi-timeframe (5m/15m/1h/4h) analysis and Crypto vs Gold comparison.
+- **`06_atr_risk_management_backtest.ipynb`**: Dynamic ATR Stop-Loss / Take-Profit backtester with account equity growth simulation.
 
 ---
 

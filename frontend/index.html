@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance Crypto Screener & Analytics Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo-icon">⚡</div>
+                <div class="brand-text">
+                    <h1>CYPHER<span>SCREEN</span></h1>
+                    <p class="subtitle">Live Binance Intelligence & Signal Terminal</p>
+                </div>
+            </div>
+            
+            <!-- Live Ticker Strip -->
+            <div class="live-ticker-strip" id="live-ticker-strip">
+                <div class="ticker-pill loading-pill">Loading BTCUSDT...</div>
+                <div class="ticker-pill loading-pill">Loading ETHUSDT...</div>
+                <div class="ticker-pill loading-pill">Loading SOLUSDT...</div>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn btn-outline" id="btn-refresh">
+                    <span class="spin-icon">↻</span> Refresh
+                </button>
+                <div class="status-indicator online">
+                    <span class="dot"></span> Live API
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main">
+            <!-- Market Overview Stats Cards -->
+            <section class="stats-grid" id="stats-grid">
+                <div class="stat-card glass-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Market Sentiment Score</span>
+                        <span class="stat-icon">📊</span>
+                    </div>
+                    <div class="stat-value" id="sentiment-val">--</div>
+                    <div class="stat-sub" id="sentiment-sub">Scanning active pairs...</div>
+                </div>
+
+                <div class="stat-card glass-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Top 24h Volume Leader</span>
+                        <span class="stat-icon">🔥</span>
+                    </div>
+                    <div class="stat-value" id="top-vol-symbol">--</div>
+                    <div class="stat-sub" id="top-vol-val">Volume: $0</div>
+                </div>
+
+                <div class="stat-card glass-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Top 24h Gainer</span>
+                        <span class="stat-icon">🚀</span>
+                    </div>
+                    <div class="stat-value gainer" id="top-gainer-symbol">--</div>
+                    <div class="stat-sub gainer" id="top-gainer-val">+0.00%</div>
+                </div>
+
+                <div class="stat-card glass-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Strong Buy Signals</span>
+                        <span class="stat-icon">⚡</span>
+                    </div>
+                    <div class="stat-value highlight" id="strong-buy-count">0</div>
+                    <div class="stat-sub">High Score Confluence</div>
+                </div>
+            </section>
+
+            <!-- Screener Controls Toolbar -->
+            <section class="screener-toolbar glass-card">
+                <div class="toolbar-left">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="search-input" placeholder="Search symbol (e.g. BTC, SOL, PEPE)...">
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Category:</label>
+                        <select id="category-select" class="select-input">
+                            <option value="ALL">All Categories</option>
+                            <option value="Layer 1">Layer 1</option>
+                            <option value="AI">AI / Data</option>
+                            <option value="DeFi">DeFi</option>
+                            <option value="Meme">Meme Coins</option>
+                            <option value="Layer 2">Layer 2</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Timeframe:</label>
+                        <select id="timeframe-select" class="select-input">
+                            <option value="15m">15m Candles</option>
+                            <option value="1h" selected>1h Candles</option>
+                            <option value="4h">4h Candles</option>
+                            <option value="1d">1d Candles</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Signal Filter:</label>
+                        <select id="signal-filter-select" class="select-input">
+                            <option value="ALL">All Recommendations</option>
+                            <option value="STRONG BUY">Strong Buy Only</option>
+                            <option value="BUY">Buy & Strong Buy</option>
+                            <option value="SELL">Sell Signals</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="toolbar-right">
+                    <span class="records-count" id="records-count">Showing 0 Pairs</span>
+                </div>
+            </section>
+
+            <!-- Screener Data Table -->
+            <section class="table-container glass-card">
+                <table class="screener-table" id="screener-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="symbol" class="sortable">Asset / Symbol <span class="sort-arrow">↕</span></th>
+                            <th data-sort="category" class="sortable">Category <span class="sort-arrow">↕</span></th>
+                            <th data-sort="price" class="sortable">Price (USDT) <span class="sort-arrow">↕</span></th>
+                            <th data-sort="price_change_24h" class="sortable">24h Change <span class="sort-arrow">↕</span></th>
+                            <th data-sort="rsi" class="sortable">RSI (14) <span class="sort-arrow">↕</span></th>
+                            <th data-sort="macd_hist" class="sortable">MACD Hist <span class="sort-arrow">↕</span></th>
+                            <th data-sort="rvol" class="sortable">RVOL (20) <span class="sort-arrow">↕</span></th>
+                            <th data-sort="quote_volume_24h" class="sortable">24h Volume <span class="sort-arrow">↕</span></th>
+                            <th data-sort="score" class="sortable">Signal Score <span class="sort-arrow">↕</span></th>
+                            <th data-sort="recommendation" class="sortable">Signal Status <span class="sort-arrow">↕</span></th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr>
+                            <td colspan="11" class="loading-cell">
+                                <div class="spinner"></div> Running market scan & calculating indicators...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Technical Chart Modal -->
+    <div class="modal-overlay" id="chart-modal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h2 id="modal-symbol">BTCUSDT</h2>
+                    <span class="badge" id="modal-category">Layer 1</span>
+                    <span class="badge" id="modal-recommendation">STRONG BUY</span>
+                </div>
+                <button class="btn-close" id="btn-close-modal">✕</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="chart-container">
+                    <canvas id="candle-chart" width="800" height="380"></canvas>
+                </div>
+
+                <div class="modal-sidebar">
+                    <h3>Technical Signals Breakdown</h3>
+                    <div class="signals-list" id="modal-signals-list">
+                        <!-- Signals injected dynamically -->
+                    </div>
+
+                    <div class="risk-calculator">
+                        <h4>Risk & Position Calculator</h4>
+                        <div class="calc-field">
+                            <label>Account Size ($):</label>
+                            <input type="number" id="calc-account" value="1000" min="10">
+                        </div>
+                        <div class="calc-field">
+                            <label>Risk Per Trade (%):</label>
+                            <input type="number" id="calc-risk" value="2" min="0.1" max="10" step="0.5">
+                        </div>
+                        <div class="calc-results" id="calc-results">
+                            <div class="calc-row"><span>Position Size:</span> <strong id="calc-pos-size">$0</strong></div>
+                            <div class="calc-row"><span>Stop Loss (1.5x ATR):</span> <strong id="calc-sl-target">$0</strong></div>
+                            <div class="calc-row"><span>Take Profit (2x Risk):</span> <strong id="calc-tp-target">$0</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

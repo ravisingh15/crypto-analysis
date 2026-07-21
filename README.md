@@ -1,4 +1,4 @@
-# ⚡ CYPHER SCREEN — Binance Live Crypto Analysis & Screener
+#  Binance Live Crypto Analysis & Screener
 
 > A high-performance, real-time Cryptocurrency Market Screener and Technical Analysis platform powered by the Binance REST API. Features parallel multi-factor pair screening, vectorized technical indicators, signal scoring, interactive web dashboard, and dedicated Jupyter notebooks for exploratory data analysis.
 
